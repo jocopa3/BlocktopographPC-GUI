@@ -3,18 +3,24 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jocopa3.blocktopographpc.gui;
+package com.jocopa3.blocktopographpc.gui.panels;
 
-import com.protolambda.blocktopograph.map.MCTileProvider;
-import com.protolambda.blocktopograph.map.MCTileProviderInfo;
+import com.jocopa3.blocktopographpc.gui.CleanableComponent;
+import com.jocopa3.blocktopographpc.gui.windows.WorldWindow;
+import com.jocopa3.blocktopographpc.gui.map.MCTileProvider;
+import com.jocopa3.blocktopographpc.gui.map.MCTileProviderInfo;
+import com.jocopa3.blocktopographpc.util.WordUtils;
+import com.protolambda.blocktopograph.map.Map;
 import com.protolambda.blocktopograph.map.renderer.MapType;
 import com.protolambda.blocktopograph.util.io.ImageUtil;
+import com.protolambda.blocktopograph.util.math.DimensionVector3;
 import com.protolambda.blocktopograph.world.World;
 import com.protolambda.blocktopograph.world.WorldProvider;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +29,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.LayoutStyle;
 import javax.swing.Timer;
@@ -37,83 +44,136 @@ import org.jxmapviewer.viewer.TileFactory;
  *
  * @author Matt
  */
-public class MapPanel extends javax.swing.JPanel {
-    static World world;
-    static WorldProvider provider;
-    
-    public static void setup() {
+public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
+
+    private World world;
+    private WorldProvider provider;
+    private int comboLastIndex = 0;
+    private TileFactory factory;
+    PanMouseInputListener mia;
+
+    public void setWorld(File worldFile) {
         try {
-            world = new World(new File("Y:\\spgOAA+RAAA=new"));
+            world = new World(worldFile);
             world.getWorldData().load();
-        }catch(Exception e) {
+        } catch (Exception e) {
             System.exit(-1);
         }
-        
+
         provider = new WorldProvider(world);
-        
-        //world.logDBKeys();
     }
-    /**
-     * Creates new form MapPanel
-     */
-    public MapPanel() {
-        initComponents();
-        setup();
-        setName("Map View");
-        
-        final List<TileFactory> factories = new ArrayList<TileFactory>();
 
-        //TileFactoryInfo osmInfo = new OSMTileFactoryInfo();
-        //TileFactoryInfo veInfo = new VirtualEarthTileFactoryInfo(VirtualEarthTileFactoryInfo.MAP);
+    public void setup() {
+        //provider = new WorldProvider(world);
 
-//		factories.add(new EmptyTileFactory());
-        //factories.add(new DefaultTileFactory(osmInfo));
-        //factories.add(new DefaultTileFactory(veInfo));
-        factories.add(new MCTileProvider(new MCTileProviderInfo(provider)));
+        //SeedLabel.setText("Seed: " + world.getWorldSeed());
+        //world.logDBKeys();
+        factory = new MCTileProvider(new MCTileProviderInfo(provider));
 
         // Setup JXMapViewer
-        mapViewer.setTileFactory(factories.get(0));
-
-        GeoPosition frankfurt = new GeoPosition(-1, -179);
+        mapViewer.setTileFactory(factory);
 
         // Set the focus
-        mapViewer.setZoom(7);
-        mapViewer.setAddressLocation(frankfurt);
-        mapViewer.setLoadingImage(ImageUtil.readImage("loading.png"));
+        mapViewer.setZoom(3);
+        DimensionVector3<Integer> spawn;
+        try {
+            spawn = Map.getSpawnPos(provider);
+            //mapViewer.setCenter(new Point2D.Float(spawn.x, spawn.z));
+            System.out.println("SpawnX: " + spawn.x + " SpawnZ: " + spawn.z);
+        } catch (Exception e) {
+
+        }
+
+        DimensionVector3<Float> playerPos;
+        try {
+            playerPos = Map.getPlayerPos(provider);
+            mapViewer.setCenter(new Point2D.Float(playerPos.x, playerPos.z));
+            System.out.println("SpawnX: " + playerPos.x + " SpawnZ: " + playerPos.z);
+        } catch (Exception e) {
+
+        }
+
+        mapViewer.setLoadingImage(ImageUtil.readImage("program_icons/icon256.png"));
         mapViewer.setRestrictOutsidePanning(false);
 
         // Add interactions
-        MouseInputListener mia = new PanMouseInputListener(mapViewer);
+        mia = new PanMouseInputListener(mapViewer);
+        
         mapViewer.addMouseListener(mia);
         mapViewer.addMouseMotionListener(mia);
-        mapViewer.setDrawTileBorders(true);
+        //mapViewer.setDrawTileBorders(true);
 
         mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCursor(mapViewer));
+
+        // Initialize combo box using map renderer enum names
         
         MapType[] values = MapType.values();
         ArrayList<String> tfLabels = new ArrayList<>(values.length);
         for (int i = 0; i < values.length; i++) {
-            tfLabels.add(values[i].name());
+            tfLabels.add(WordUtils.capitalizeString(values[i].name()));
         }
-        
-        combo.setModel(new DefaultComboBoxModel<String>( tfLabels.toArray(new String[0])) );
-        
-        combo.setSelectedIndex(tfLabels.indexOf(provider.getMapType().name()));
-        
+
+        combo.setModel(new DefaultComboBoxModel<String>(tfLabels.toArray(new String[0])));
+
+        comboLastIndex = tfLabels.indexOf(WordUtils.capitalizeString(provider.getMapType().name()));
+        combo.setSelectedIndex(comboLastIndex);
+
         combo.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() != ItemEvent.SELECTED)
+                    return;
+                
                 provider.changeMapType(values[combo.getSelectedIndex()]);
-                ((MCTileProvider)factories.get(0)).clearCache();
-                //mapViewer.setTileFactory(factory);
+                ((MCTileProvider) factory).clearCache();
+                ((MCTileProvider) factory).stopAllThreads();
+
+                // Dimension is being changed; clear chunk cache from previous dimension
+                if (!values[comboLastIndex].dimension.equals(values[combo.getSelectedIndex()].dimension)) {
+                    provider.getChunkManager(values[comboLastIndex].dimension).disposeAll();
+                }
+
+                comboLastIndex = combo.getSelectedIndex();
+                
+                ((MapPanel)((JComboBox)e.getSource()).getParent()).setName(tfLabels.get(combo.getSelectedIndex()));
             }
         });
+    }
 
-        Timer t = new Timer(500, new ActionListener() {
+    /**
+     * Creates new form MapPanel
+     */
+    public MapPanel(World world, WorldProvider provider) {
+        initComponents();
+        this.world = world;
+        this.provider = provider;
+        
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                setup();
+            }
+        });
+        
+        setName("Map");
+
+        //TileFactoryInfo osmInfo = new OSMTileFactoryInfo();
+        //TileFactoryInfo veInfo = new VirtualEarthTileFactoryInfo(VirtualEarthTileFactoryInfo.MAP);
+//		factories.add(new EmptyTileFactory());
+        //factories.add(new DefaultTileFactory(osmInfo));
+        //factories.add(new DefaultTileFactory(veInfo));
+        Timer t = new Timer(50, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Set<Thread> threads = Thread.getAllStackTraces().keySet();
-                labelThreadCount.setText("Threads: " + threads.size());
+                //Set<Thread> threads = Thread.getAllStackTraces().keySet();
+                //labelThreadCount.setText("Threads: " + threads.size());
+                Point2D pixelCoordinates = mia.getMouseCoords();
+                
+                if(pixelCoordinates == null)
+                    return;
+                
+                GeoPosition g = mapViewer.getTileFactory().pixelToGeo(pixelCoordinates, mapViewer.getZoom());
+                //xPos.setText(""+g.getLatitude());
+                //yPos.setText(""+g.getLongitude());
             }
         });
 
@@ -184,4 +244,13 @@ public class MapPanel extends javax.swing.JPanel {
     private JLabel labelThreadCount;
     private JXMapViewer mapViewer;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public boolean cleanUp() {
+        ((MCTileProvider)factory).clearCache();
+        ((MCTileProvider)factory).clearQueue();
+        ((MCTileProvider)factory).stopAllThreads(); // This is critical
+        
+        return true;
+    }
 }
