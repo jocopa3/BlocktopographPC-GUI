@@ -46,7 +46,6 @@ public class WorldWindowFooterBar extends javax.swing.JPanel {
         setBorder(BorderFactory.createEtchedBorder());
 
         footerMessage.setHorizontalAlignment(SwingConstants.RIGHT);
-        footerMessage.setText("jLabel1");
         footerMessage.setHorizontalTextPosition(SwingConstants.RIGHT);
 
         messageIconLabel.setIconTextGap(0);

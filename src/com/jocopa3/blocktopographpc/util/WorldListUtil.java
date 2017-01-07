@@ -83,7 +83,6 @@ public class WorldListUtil {
             
             System.out.println(folder.toString());
             if (new File(folder.toString()).exists()) {
-                System.out.println("Exists");
                 return folder.toString();
             }
         }

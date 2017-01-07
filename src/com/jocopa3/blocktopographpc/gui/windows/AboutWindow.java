@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -99,14 +100,14 @@ public class AboutWindow extends javax.swing.JFrame {
 
         librariesScrollPane.setBackground(mainPanel.getBackground()
         );
-        librariesScrollPane.setBorder(null);
+        librariesScrollPane.setBorder(BorderFactory.createEtchedBorder());
 
         librariesEditorPane.setEditable(false);
         librariesEditorPane.setBackground(mainPanel.getBackground()
         );
         librariesEditorPane.setBorder(null);
         librariesEditorPane.setContentType("text/html"); // NOI18N
-        librariesEditorPane.setText("<html>\r\n  <head>\r\n\r    <style>\n      a {\n        color: #0060A0;\n        text-decoration: none;\n        cursor: pointer;\n      }\n\n      ul {\n        margin: 0;\n        padding-left: 15px;\n      }\n    </style>\n  </head>\r\n  <body>\r\n    <p style=\"margin-top: 0;\">\r\n      Libraries used:\n      <ul>\n        <li><a href=\"https://github.com/protolambda/blocktopograph-lib\">Blocktopograph-Lib</a></li>\n        <li><a href=\"https://github.com/java-native-access/jna\">Java Native Access</a></li>\n        <li><a href=\"https://github.com/ben-manes/concurrentlinkedhashmap\">Java ConcurrentLinkedHashmap</a></li>\n        <li><a href=\"https://github.com/protonail/leveldb-jna\">LevelDB JNA</a> with <a href=\"https://github.com/protonail/leveldb-jna\">LevelDB-MCPE</a></li>\n        <li><a href=\"https://github.com/msteiger/jxmapviewer2\">JXMapViewer2</a></li>\n      </ul>\n    </p>\r\n  </body>\r\n</html>\r\n");
+        librariesEditorPane.setText("<html>\r\n  <head>\r\n\r    <style>\n      a {\n        color: #0060A0;\n        text-decoration: none;\n        cursor: pointer;\n      }\n\n      ul {\n        margin: 0;\n        padding-left: 15px;\n      }\n    </style>\n  </head>\r\n  <body>\r\n    <p style=\"margin-top: 0;\">\r\n      Libraries used:\n      <ul>\n        <li><a href=\"https://github.com/protolambda/blocktopograph-lib\">Blocktopograph-Lib</a></li>\n        <li><a href=\"https://github.com/java-native-access/jna\">Java Native Access</a></li>\n        <li><a href=\"https://github.com/ben-manes/concurrentlinkedhashmap\">Java ConcurrentLinkedHashmap</a></li>\n        <li><a href=\"https://github.com/protonail/leveldb-jna\">LevelDB JNA</a> with <a href=\"https://github.com/Mojang/leveldb-mcpe\">LevelDB-MCPE</a></li>\n        <li><a href=\"https://github.com/msteiger/jxmapviewer2\">JXMapViewer2</a></li>\n      </ul>\n    </p>\r\n    <p>\n      Licenses for each library can be found in the \"Licenses\" folder included with this program.\n    </p>\n  </body>\r\n</html>\r\n");
         librariesEditorPane.addHyperlinkListener(new HyperlinkListener() {
             public void hyperlinkUpdate(HyperlinkEvent evt) {
                 librariesEditorPaneHyperlinkUpdate(evt);
@@ -116,7 +117,7 @@ public class AboutWindow extends javax.swing.JFrame {
 
         aboutScrollPane.setBackground(mainPanel.getBackground()
         );
-        aboutScrollPane.setBorder(null);
+        aboutScrollPane.setBorder(BorderFactory.createEtchedBorder());
 
         aboutEditorPane.setEditable(false);
         aboutEditorPane.setBackground(mainPanel.getBackground()
@@ -137,7 +138,7 @@ public class AboutWindow extends javax.swing.JFrame {
             .addGroup(mainPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(mainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(librariesScrollPane, GroupLayout.DEFAULT_SIZE, 719, Short.MAX_VALUE)
+                    .addComponent(librariesScrollPane, GroupLayout.DEFAULT_SIZE, 747, Short.MAX_VALUE)
                     .addGroup(mainPanelLayout.createSequentialGroup()
                         .addGroup(mainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                             .addGroup(mainPanelLayout.createSequentialGroup()
@@ -156,9 +157,9 @@ public class AboutWindow extends javax.swing.JFrame {
                     .addGroup(mainPanelLayout.createSequentialGroup()
                         .addComponent(aboutLabel)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(aboutScrollPane, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)))
+                        .addComponent(aboutScrollPane, GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(librariesScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(librariesScrollPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 

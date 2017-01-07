@@ -5,6 +5,9 @@
  */
 package com.jocopa3.blocktopographpc.gui.map;
 
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import com.protolambda.blocktopograph.SystemProfile;
+import com.protolambda.blocktopograph.chunk.Chunk;
 import com.protolambda.blocktopograph.chunk.ChunkManager;
 import com.protolambda.blocktopograph.chunk.Version;
 import com.protolambda.blocktopograph.map.Dimension;
@@ -21,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -38,15 +42,24 @@ import org.jxmapviewer.viewer.TileFactory;
  */
 public class MCTileProvider extends TileFactory {
 
-    private Map<String, MCTile> tileMap = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, MCTile> tileMap;
     MCTileProviderInfo info;
 
-    private int threadPoolSize = Math.min(Runtime.getRuntime().availableProcessors(), 16);
+    // Use at least 1 thread and at most 16 threads; also don't hog all available cores.
+    private int threadPoolSize = Math.max(Math.min(Runtime.getRuntime().availableProcessors() - 1, 16), 1);
     private ExecutorService service;
 
     public MCTileProvider(MCTileProviderInfo info) {
         super(info);
         this.info = info;
+        
+        // MAGIC!
+        int cacheSize = 1000 * SystemProfile.getRAMUsagePolicy().mult;
+        System.out.println("Tile Cache Size: " + cacheSize);
+        
+        tileMap = new ConcurrentLinkedHashMap.Builder<String, MCTile>()
+                .maximumWeightedCapacity(cacheSize)
+                .build();
     }
 
     @Override

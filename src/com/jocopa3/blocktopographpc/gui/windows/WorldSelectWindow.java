@@ -174,9 +174,9 @@ public class WorldSelectWindow extends javax.swing.JFrame {
     public void setVisible(boolean visible) {
         super.setVisible(visible);
 
-        if (visible) {
-            worldListPanel.reloadWorldList();
-        }
+        //if (visible) {
+        //    worldListPanel.reloadWorldList();
+        //}
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

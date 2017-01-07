@@ -32,11 +32,20 @@ public class Main {
     public static final Options Options = new Options();
 
     public static boolean checkIsOSSupported() {
-        if (!Platform.isWindows()) {
-            return false;
+        switch(Platform.getOSType()) {
+            case Platform.WINDOWS:
+                return true;
+            case Platform.MAC:
+                return false;
+            case Platform.LINUX:
+                return true;
+            case Platform.FREEBSD:
+                return false;
+            case Platform.OPENBSD:
+                return false;
+            default:
+                return false;
         }
-
-        return true;
     }
 
     public static String getArchType() {
@@ -56,19 +65,43 @@ public class Main {
         String nativesFolder = File.separator + "natives" + File.separator;
         String suffix = Platform.is64Bit() ? "x64" : "x86";
 
-        if (Platform.isWindows()) {
-            nativesFolder += "windows" + File.separator + suffix + File.separator;
+        switch(Platform.getOSType()) {
+            case Platform.WINDOWS:
+                nativesFolder += "windows";
+                break;
+            case Platform.MAC:
+                nativesFolder += "mac";
+                break;
+            case Platform.LINUX:
+                nativesFolder += "linux";
+                break;
+            case Platform.FREEBSD:
+                nativesFolder += "freebsd";
+                break;
+            case Platform.OPENBSD:
+                nativesFolder += "openbsd";
+                break;
         }
         
-        System.out.println((new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile()).getPath() + nativesFolder);
+        nativesFolder += File.separator + suffix + File.separator;
         
-        NativeLibrary.addSearchPath("leveldb", (new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile()).getPath() + nativesFolder);
+        String nativesFolderPath = (new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile()).getPath() + nativesFolder;
+        
+        //System.out.println((new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile()).getPath() + nativesFolder);
+        
+        if(!new File(nativesFolderPath).exists()) {
+            JOptionPane.showMessageDialog(null, "Could not find natives folder: " + nativesFolder, "No Natives Found", JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
+        }
+        
+        NativeLibrary.addSearchPath("leveldb", nativesFolderPath);
     }
 
     public static void main(String[] args) {
+        System.out.println(com.protolambda.blocktopograph.SystemProfile.getAvailableRAM());
         setupNatives();
 
-        /* Set the Nimbus look and feel
+        /* Set the Nimbus look and feel */
         try {
             //javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -86,8 +119,6 @@ public class Main {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(WorldSelectWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        */
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {

@@ -140,6 +140,39 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
         super.paint(g);
     }
 
+    private String getTagShortcut(NBTType type) {
+        switch (type) {
+                case END:
+                    return "";
+                case BYTE:
+                    return " (Alt-B)";
+                case SHORT:
+                    return " (Alt-S)";
+                case INT:
+                    return " (Alt-I)";
+                case LONG:
+                    return " (Alt-L)";
+                case FLOAT:
+                    return " (Alt-F)";
+                case DOUBLE:
+                    return " (Alt-D)";
+                case BYTE_ARRAY:
+                    return " (Alt-Shift-B)";
+                case STRING:
+                    return " (Alt-Shift-S)";
+                case LIST:
+                    return " (Alt-Shift-L)";
+                case COMPOUND:
+                    return " (Alt-C)";
+                case INT_ARRAY:
+                    return " (Alt-Shift-I)";
+                case SHORT_ARRAY:
+                    return "";
+                default:
+                    return "";
+            }
+    }
+    
     private void initButtonIcons(Graphics g) {
         for (NBTType type : NBTType.editorOptions_asType) {
             NBTIcon icon = NBTIcon.getIconByType(type);
@@ -153,19 +186,18 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                 FontMetrics metrics = g.getFontMetrics(addTagButton.getFont());
                 int height = metrics.getHeight() - 1;
                 float scaleRatio = ((float) height) / ((float) NBTIcon.END.icon.getIconWidth());
-                System.out.println(height + " " + scaleRatio);
 
                 iconWidth = Math.round(((float) NBTIcon.END.icon.getIconWidth()) * scaleRatio);
                 iconHeight = height;
             } else {
-                iconWidth = 20;
-                iconHeight = 20;
+                iconWidth = addTagButton.getFont().getSize();
+                iconHeight = addTagButton.getFont().getSize();
             }
 
             addTagButton.setIcon(icon.getIcon(iconWidth, iconHeight));
             addTagButton.setFocusable(false);
 
-            addTagButton.setToolTipText("Add " + WordUtils.whitespaceBeforeUppercase(icon.getDisplayName()));
+            addTagButton.setToolTipText("Add " + WordUtils.whitespaceBeforeUppercase(icon.getDisplayName()) + getTagShortcut(type));
 
             addTagButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
@@ -197,7 +229,6 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
             iconWidth = Math.round(((float) icon.getBlackIcon().getIconWidth()) * scaleRatio);
             iconHeight = height;
         } else {
-            System.out.println("Material is null: " + (button.getFont() == null) + ", " + (g == null));
             iconWidth = button.getFont().getSize();
             iconHeight = button.getFont().getSize();
         }
@@ -287,7 +318,7 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
         buttonToolBar.setFloatable(false);
         buttonToolBar.setRollover(true);
 
-        saveToolbarButton.setToolTipText("Save NBT Data");
+        saveToolbarButton.setToolTipText("Save NBT Data (Ctrl-S)");
         saveToolbarButton.setFocusable(false);
         saveToolbarButton.setHorizontalTextPosition(SwingConstants.CENTER);
         saveToolbarButton.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -298,7 +329,7 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
         });
         buttonToolBar.add(saveToolbarButton);
 
-        cutToolbarButton.setToolTipText("Cut Selected Nodes");
+        cutToolbarButton.setToolTipText("Cut Selected Nodes (Ctrl-X)");
         cutToolbarButton.setFocusable(false);
         cutToolbarButton.setHorizontalTextPosition(SwingConstants.CENTER);
         cutToolbarButton.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -309,7 +340,7 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
         });
         buttonToolBar.add(cutToolbarButton);
 
-        copyToolbarButton.setToolTipText("Copy Selected Nodes");
+        copyToolbarButton.setToolTipText("Copy Selected Nodes (Ctrl-C)");
         copyToolbarButton.setFocusable(false);
         copyToolbarButton.setHorizontalTextPosition(SwingConstants.CENTER);
         copyToolbarButton.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -320,7 +351,7 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
         });
         buttonToolBar.add(copyToolbarButton);
 
-        pasteToolbarButton.setToolTipText("Paste Into Selected Nodes");
+        pasteToolbarButton.setToolTipText("Paste Into Selected Nodes (Ctrl-V)");
         pasteToolbarButton.setFocusable(false);
         pasteToolbarButton.setHorizontalTextPosition(SwingConstants.CENTER);
         pasteToolbarButton.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -331,7 +362,7 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
         });
         buttonToolBar.add(pasteToolbarButton);
 
-        deleteToolbarButton.setToolTipText("Delete Selected Nodes");
+        deleteToolbarButton.setToolTipText("Delete Selected Nodes (Del)");
         deleteToolbarButton.setFocusable(false);
         deleteToolbarButton.setHorizontalTextPosition(SwingConstants.CENTER);
         deleteToolbarButton.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -428,11 +459,11 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                 switch (selectedNode.getTag().getType()) {
                     case COMPOUND:
                     case LIST:
-                        selectedNode.addTag(new NBTNode(NBTConstants.NBTType.newInstance("NewTag", type), selectedNode.getTag()));
+                        selectedNode.addTag(new NBTNode(NBTConstants.NBTType.newInstance("New"+type.displayName, type), selectedNode.getTag()));
                         model.reload(selectedNode);
                         break;
                     default:
-                        ((NBTNode) selectedNode.getParent()).addTag(new NBTNode(NBTConstants.NBTType.newInstance("NewTag", type), selectedNode.getTag()));
+                        ((NBTNode) selectedNode.getParent()).addTag(new NBTNode(NBTConstants.NBTType.newInstance("New"+type.displayName, type), selectedNode.getTag()));
                         model.reload(selectedNode.getParent());
                         break;
                 }
@@ -496,16 +527,16 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                         break;
                     case LIST:
                         NBTType listType = ((ListTag) selectedNode.getTag()).getListType();
-                        boolean listEmpty = ((ListTag)selectedNode.getTag()).getValue().isEmpty();
-                        
+                        boolean listEmpty = ((ListTag) selectedNode.getTag()).getValue().isEmpty();
+
                         for (NBTNode clipboardNode : clipboard) {
                             if (!listEmpty || clipboardNode.getTag().getType() != listType) {
                                 continue;
                             }
-                            
+
                             listEmpty = false;
                             listType = clipboardNode.getTag().getType();
-                            
+
                             NBTNode clone = new NBTNode(clipboardNode.getTag().getDeepCopy(), selectedNode.getTag());
 
                             iterateTags(clone);
@@ -652,7 +683,7 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
         }
 
         System.out.println("New Tag Values: " + node.getTag().getName() + ", " + value);
-        System.out.println("New Tag Object: " + node.getUserObject());
+        //System.out.println("New Tag Object: " + node.getUserObject());
         return returnValue;
     }
 
@@ -694,10 +725,13 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            int iconHeight = cell.getFont().getSize();
+
             if (value instanceof NBTNode) {
                 Tag tag = ((NBTNode) value).getTag();
-                ImageIcon nbtIcon;
+                ImageIcon nbtIcon = ((NBTNode) value).getIcon(iconHeight, iconHeight);
 
+                /*
                 if (cell.getFont() != null && cell.getGraphics() != null) {
                     // Find out how much to scale the icon by
                     FontMetrics metrics = cell.getGraphics().getFontMetrics(cell.getFont());
@@ -707,10 +741,10 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                     nbtIcon = ((NBTNode) value).getIcon(Math.round(((NBTNode) value).getDefaultIconWidth() * scaleRatio), height);
                 } else {
                     // Guess the size
-                    System.out.println("Is null: " + (cell.getFont() == null) + ", " + (cell.getGraphics() == null));
+                    //System.out.println("Is null: " + (cell.getFont() == null) + ", " + (cell.getGraphics() == null));
                     nbtIcon = ((NBTNode) value).getLastScaledIcon();
                 }
-
+                 */
                 if (nbtIcon != null) {
                     cell.setIcon(nbtIcon);
                 }
@@ -739,9 +773,9 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                         cell.shouldShowValue(true);
                 }
             } else {
-                System.out.println("This is odd... " + value.getClass().getName());
-                cell.setName("This is odd... " + value.getClass().getName()); // Change text for the public release
-                cell.setIcon(NBTIcon.END.getIcon(20, 20)); // The END tag uses the default icon
+                //System.out.println("This is odd... " + value.getClass().getName());
+                //cell.setName("This is odd... " + value.getClass().getName()); // Change text for the public release
+                cell.setIcon(NBTIcon.END.getIcon(iconHeight, iconHeight)); // The END tag uses the default icon
             }
 
             return cell;
@@ -816,19 +850,15 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
             if (PlatformUtils.isCtrlKeyDown(e)) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_C:
-                        System.out.println("Ctrl+C");
                         copySelectedNodesToClipboard();
                         break;
                     case KeyEvent.VK_V:
-                        System.out.println("Ctrl+V");
                         pasteClipboardIntoSelectedNodes();
                         break;
                     case KeyEvent.VK_X:
-                        System.out.println("Ctrl+X");
                         cutSelectedNodesToClipboard();
                         break;
                     case KeyEvent.VK_S:
-                        System.out.println("Ctrl+S");
                         saveNBTData();
                         break;
                     default:

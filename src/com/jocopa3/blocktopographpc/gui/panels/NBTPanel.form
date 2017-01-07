@@ -113,7 +113,7 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="saveToolbarButton">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="Save NBT Data"/>
+            <Property name="toolTipText" type="java.lang.String" value="Save NBT Data (Ctrl-S)"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -124,7 +124,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="cutToolbarButton">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="Cut Selected Nodes"/>
+            <Property name="toolTipText" type="java.lang.String" value="Cut Selected Nodes (Ctrl-X)"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -135,7 +135,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="copyToolbarButton">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="Copy Selected Nodes"/>
+            <Property name="toolTipText" type="java.lang.String" value="Copy Selected Nodes (Ctrl-C)"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -146,7 +146,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="pasteToolbarButton">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="Paste Into Selected Nodes"/>
+            <Property name="toolTipText" type="java.lang.String" value="Paste Into Selected Nodes (Ctrl-V)"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -157,7 +157,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="deleteToolbarButton">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="Delete Selected Nodes"/>
+            <Property name="toolTipText" type="java.lang.String" value="Delete Selected Nodes (Del)"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
