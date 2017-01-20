@@ -14,6 +14,7 @@ import com.jocopa3.blocktopographpc.gui.windows.WorldWindow;
 import com.jocopa3.blocktopographpc.util.MessageImportance;
 import com.jocopa3.blocktopographpc.util.PlatformUtils;
 import com.jocopa3.blocktopographpc.util.WordUtils;
+import com.jocopa3.blocktopographpc.util.nbt.NBTSignature;
 import com.protolambda.blocktopograph.nbt.EditableNBT;
 import com.protolambda.blocktopograph.nbt.convert.NBTConstants;
 import com.protolambda.blocktopograph.nbt.convert.NBTConstants.NBTType;
@@ -614,6 +615,23 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
             nbtTree.startEditingAtPath(lastSelectedNode);
         }
     }
+    
+    private void printTagSignature() {
+        TreePath[] paths = nbtTree.getSelectionPaths();
+        if (paths == null) {
+            return;
+        }
+
+        for (TreePath path : paths) {
+            if (path.getLastPathComponent() instanceof NBTNode) {
+                NBTNode selectedNode = (NBTNode) path.getLastPathComponent();
+                Tag tag = selectedNode.getTag();
+                Tag parentTag = selectedNode.getParentTag();
+                
+                System.out.format("Signature for %s (%s): %X%n", tag.getName(), tag.getType().displayName, NBTSignature.calculateTagSignature(tag, parentTag));
+            }
+        }
+    }
 
     private boolean parseNodeValue(NBTNode node) {
         String nodeText = (String) node.getUserObject();
@@ -729,6 +747,7 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
 
             if (value instanceof NBTNode) {
                 Tag tag = ((NBTNode) value).getTag();
+                Tag parentTag = ((NBTNode) value).getParentTag();
                 ImageIcon nbtIcon = ((NBTNode) value).getIcon(iconHeight, iconHeight);
 
                 /*
@@ -754,7 +773,8 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                 switch (tag.getType()) {
                     case COMPOUND:
                     case LIST:
-                        cell.shouldShowValue(false);
+                        cell.shouldShowValue(true);
+                        cell.setTagValue("");
                         break;
                     case BYTE_ARRAY:
                         cell.setTagValue(Arrays.toString((byte[]) tag.getValue()));
@@ -772,6 +792,8 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                         cell.setTagValue(tag.getValue().toString());
                         cell.shouldShowValue(true);
                 }
+                
+                cell.setAdditionalInfo(NBTSignature.parseTagInfo(tag, parentTag));
             } else {
                 //System.out.println("This is odd... " + value.getClass().getName());
                 //cell.setName("This is odd... " + value.getClass().getName()); // Change text for the public release
@@ -860,6 +882,9 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                         break;
                     case KeyEvent.VK_S:
                         saveNBTData();
+                        break;
+                    case KeyEvent.VK_P:
+                        printTagSignature();
                         break;
                     default:
                     //System.out.println("Ctrl+" + KeyEvent.getKeyText(e.getKeyCode()));

@@ -242,7 +242,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openPlayerNBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openPlayerNBTActionPerformed
         EditableNBT playerNBT = null;
         try {
-            playerNBT = parentWindow.provider.getEditablePlayer();
+            playerNBT = parentWindow.getWorldProvider().getEditablePlayer();
         } catch (Exception ex) {
             return;
         }
@@ -258,7 +258,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openMultiplayerNBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openMultiplayerNBTActionPerformed
         EditableNBT playerNBT = null;
         try {
-            playerNBT = parentWindow.provider.openEditableNbtLevel(null);
+            playerNBT = parentWindow.getWorldProvider().openEditableNbtLevel(null);
         } catch (Exception ex) {
             return;
         }
@@ -274,7 +274,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openWorldNBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openWorldNBTActionPerformed
         EditableNBT worldNBT = null;
         try {
-            worldNBT = parentWindow.provider.openEditableNbtLevel(null);
+            worldNBT = parentWindow.getWorldProvider().openEditableNbtLevel(null);
         } catch (Exception ex) {
             return;
         }
@@ -290,7 +290,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openNetherNBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openNetherNBTActionPerformed
         EditableNBT nbtData = null;
         try {
-            nbtData = parentWindow.provider.openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.NETHER);
+            nbtData = parentWindow.getWorldProvider().openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.NETHER);
         } catch (Exception ex) {
             return;
         }
@@ -306,7 +306,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openOverworldNBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openOverworldNBTActionPerformed
         EditableNBT nbtData = null;
         try {
-            nbtData = parentWindow.provider.openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.OVERWORLD);
+            nbtData = parentWindow.getWorldProvider().openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.OVERWORLD);
         } catch (Exception ex) {
             return;
         }
@@ -322,7 +322,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openEndNBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openEndNBTActionPerformed
         EditableNBT nbtData = null;
         try {
-            nbtData = parentWindow.provider.openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.THEEND);
+            nbtData = parentWindow.getWorldProvider().openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.THEEND);
         } catch (Exception ex) {
             return;
         }
@@ -338,7 +338,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openVillagesNBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openVillagesNBTActionPerformed
         EditableNBT nbtData = null;
         try {
-            nbtData = parentWindow.provider.openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.M_VILLAGES);
+            nbtData = parentWindow.getWorldProvider().openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.M_VILLAGES);
         } catch (Exception ex) {
             return;
         }
@@ -354,7 +354,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openPortalsNBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openPortalsNBTActionPerformed
         EditableNBT nbtData = null;
         try {
-            nbtData = parentWindow.provider.openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.PORTALS);
+            nbtData = parentWindow.getWorldProvider().openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.PORTALS);
         } catch (Exception ex) {
             return;
         }
@@ -370,7 +370,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openDimension0NBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openDimension0NBTActionPerformed
         EditableNBT nbtData = null;
         try {
-            nbtData = parentWindow.provider.openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.DIMENSION_0);
+            nbtData = parentWindow.getWorldProvider().openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.DIMENSION_0);
         } catch (Exception ex) {
             return;
         }
@@ -386,7 +386,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openDimension1NBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openDimension1NBTActionPerformed
         EditableNBT nbtData = null;
         try {
-            nbtData = parentWindow.provider.openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.DIMENSION_1);
+            nbtData = parentWindow.getWorldProvider().openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.DIMENSION_1);
         } catch (Exception ex) {
             return;
         }
@@ -402,7 +402,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openDimension2NBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openDimension2NBTActionPerformed
         EditableNBT nbtData = null;
         try {
-            nbtData = parentWindow.provider.openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.DIMENSION_2);
+            nbtData = parentWindow.getWorldProvider().openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.DIMENSION_2);
         } catch (Exception ex) {
             return;
         }
@@ -418,7 +418,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openAutonomousEntitiesNBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openAutonomousEntitiesNBTActionPerformed
         EditableNBT nbtData = null;
         try {
-            nbtData = parentWindow.provider.openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.AUTONOMOUS_ENTITIES);
+            nbtData = parentWindow.getWorldProvider().openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.AUTONOMOUS_ENTITIES);
         } catch (Exception ex) {
             return;
         }
@@ -434,7 +434,7 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
     private void openBiomeDataNBTActionPerformed(ActionEvent evt) {//GEN-FIRST:event_openBiomeDataNBTActionPerformed
         EditableNBT nbtData = null;
         try {
-            nbtData = parentWindow.provider.openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.BIOME_DATA);
+            nbtData = parentWindow.getWorldProvider().openSpecialEditableNbtDbEntry(World.SpecialDBEntryType.BIOME_DATA);
         } catch (Exception ex) {
             return;
         }

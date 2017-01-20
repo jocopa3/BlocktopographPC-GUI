@@ -88,6 +88,11 @@ public class NBTCell extends javax.swing.JPanel {
     public void setTagValue(String tag) {
         valueLabel.setText(tag);
     }
+    
+    public void setAdditionalInfo(String info) {
+        valueLabel.setText(valueLabel.getText() + " " + info);
+        isValueVisible = true;
+    }
 
     public void shouldShowValue(boolean show) {
         valueLabel.setVisible(show);

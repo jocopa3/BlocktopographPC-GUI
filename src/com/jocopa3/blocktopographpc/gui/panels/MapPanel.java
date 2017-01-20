@@ -9,6 +9,7 @@ import com.jocopa3.blocktopographpc.gui.CleanableComponent;
 import com.jocopa3.blocktopographpc.gui.windows.WorldWindow;
 import com.jocopa3.blocktopographpc.gui.map.MCTileProvider;
 import com.jocopa3.blocktopographpc.gui.map.MCTileProviderInfo;
+import com.jocopa3.blocktopographpc.util.PlatformUtils;
 import com.jocopa3.blocktopographpc.util.WordUtils;
 import com.protolambda.blocktopograph.map.Map;
 import com.protolambda.blocktopograph.map.renderer.MapType;
@@ -16,10 +17,13 @@ import com.protolambda.blocktopograph.util.io.ImageUtil;
 import com.protolambda.blocktopograph.util.math.DimensionVector3;
 import com.protolambda.blocktopograph.world.World;
 import com.protolambda.blocktopograph.world.WorldProvider;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
@@ -29,11 +33,15 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.LayoutStyle;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
+import javax.swing.tree.TreePath;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.input.PanMouseInputListener;
 import org.jxmapviewer.input.ZoomMouseWheelListenerCursor;
@@ -99,6 +107,7 @@ public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
         // Add interactions
         mia = new PanMouseInputListener(mapViewer);
         
+        mapViewer.addMouseListener(new PopupTriggerListener());
         mapViewer.addMouseListener(mia);
         mapViewer.addMouseMotionListener(mia);
         //mapViewer.setDrawTileBorders(true);
@@ -164,16 +173,19 @@ public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
         Timer t = new Timer(50, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Set<Thread> threads = Thread.getAllStackTraces().keySet();
-                //labelThreadCount.setText("Threads: " + threads.size());
+                Set<Thread> threads = Thread.getAllStackTraces().keySet();
+                labelThreadCount.setText("Threads: " + threads.size());
                 Point2D pixelCoordinates = mia.getMouseCoords();
                 
                 if(pixelCoordinates == null)
                     return;
                 
-                GeoPosition g = mapViewer.getTileFactory().pixelToGeo(pixelCoordinates, mapViewer.getZoom());
-                //xPos.setText(""+g.getLatitude());
-                //yPos.setText(""+g.getLongitude());
+                //GeoPosition g = mapViewer.getTileFactory().pixelToGeo(pixelCoordinates, mapViewer.getZoom());
+                //GeoPosition gg = new GeoPosition(g.getLatitude() + mapViewer.getCenterPosition().getLatitude(), g.getLongitude() + mapViewer.getCenterPosition().getLongitude());
+                //Point2D xy = mapViewer.getTileFactory().geoToPixel(gg, mapViewer.getZoom());
+                Rectangle rect = mapViewer.getViewportBounds();
+                //xLabel.setText(""+(rect.x + pixelCoordinates.getX()));
+                //yLabel.setText(""+(rect.y + pixelCoordinates.getY()));
             }
         });
 
@@ -189,11 +201,22 @@ public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        mapPopupMenu = new JPopupMenu();
+        openEntityNbtMenuItem = new JMenuItem();
+        openTileEntityNbtMenuItem = new JMenuItem();
         mapViewer = new JXMapViewer();
         jLabel1 = new JLabel();
         jSeparator1 = new JSeparator();
         combo = new JComboBox<>();
         labelThreadCount = new JLabel();
+        xLabel = new JLabel();
+        yLabel = new JLabel();
+
+        openEntityNbtMenuItem.setText("Edit Entities");
+        mapPopupMenu.add(openEntityNbtMenuItem);
+
+        openTileEntityNbtMenuItem.setText("Edit Tile Entities");
+        mapPopupMenu.add(openTileEntityNbtMenuItem);
 
         GroupLayout mapViewerLayout = new GroupLayout(mapViewer);
         mapViewer.setLayout(mapViewerLayout);
@@ -214,7 +237,11 @@ public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(labelThreadCount)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 204, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(xLabel)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(yLabel)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 176, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(combo, GroupLayout.PREFERRED_SIZE, 182, GroupLayout.PREFERRED_SIZE)
@@ -228,7 +255,9 @@ public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(combo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelThreadCount))
+                    .addComponent(labelThreadCount)
+                    .addComponent(xLabel)
+                    .addComponent(yLabel))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -242,7 +271,12 @@ public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
     private JLabel jLabel1;
     private JSeparator jSeparator1;
     private JLabel labelThreadCount;
+    private JPopupMenu mapPopupMenu;
     private JXMapViewer mapViewer;
+    private JMenuItem openEntityNbtMenuItem;
+    private JMenuItem openTileEntityNbtMenuItem;
+    private JLabel xLabel;
+    private JLabel yLabel;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -252,5 +286,24 @@ public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
         ((MCTileProvider)factory).stopAllThreads(); // This is critical
         
         return true;
+    }
+    
+    class PopupTriggerListener extends MouseAdapter {
+
+        public void mousePressed(MouseEvent ev) {
+            if (ev.isPopupTrigger()) {
+                mapPopupMenu.show(ev.getComponent(), ev.getX(), ev.getY());
+            }
+        }
+
+        public void mouseReleased(MouseEvent ev) {
+            if (ev.isPopupTrigger()) {
+                System.out.println(mapViewer.getCenterPosition());
+                mapPopupMenu.show(ev.getComponent(), ev.getX(), ev.getY());
+            }
+        }
+
+        public void mouseClicked(MouseEvent ev) {
+        }
     }
 }

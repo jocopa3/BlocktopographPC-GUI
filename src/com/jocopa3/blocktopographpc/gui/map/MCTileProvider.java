@@ -54,7 +54,7 @@ public class MCTileProvider extends TileFactory {
         this.info = info;
         
         // MAGIC!
-        int cacheSize = 1000 * SystemProfile.getRAMUsagePolicy().mult;
+        long cacheSize = SystemProfile.calculateMaxObjects(262144, 0.3);
         System.out.println("Tile Cache Size: " + cacheSize);
         
         tileMap = new ConcurrentLinkedHashMap.Builder<String, MCTile>()
@@ -581,9 +581,11 @@ public class MCTileProvider extends TileFactory {
 
             for (z = minChunkZ, pY = 0; z < maxChunkZ; z++, pY += pixelsPerChunkL) {
                 for (x = minChunkX, pX = 0; x < maxChunkX; x++, pX += pixelsPerChunkW) {
+                    // Check that the thread isn't being interrupted
                     if (Thread.interrupted()) {
                         return null;
                     }
+                    
                     try {
                         renderer.renderToBitmap(cm, img, dimension,
                                 Math.round(x), Math.round(z),
@@ -595,8 +597,10 @@ public class MCTileProvider extends TileFactory {
                         clearCache();
                         cm.disposeAll();
                         e.printStackTrace();
+                        return null;
                     } catch (Version.VersionException ex) {
                         Logger.getLogger(MCTileProvider.class.getName()).log(Level.SEVERE, null, ex);
+                        return null;
                     }
                 }
             }

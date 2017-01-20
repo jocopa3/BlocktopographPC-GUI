@@ -65,7 +65,6 @@ public class WorldSelectWindow extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(380, 3840));
         setMinimumSize(new java.awt.Dimension(325, 540));
-        setPreferredSize(new java.awt.Dimension(325, 540));
 
         worldListPanel.reloadWorldList();
 
@@ -193,13 +192,13 @@ public class WorldSelectWindow extends javax.swing.JFrame {
         WorldWindow mw = new WorldWindow(world);
 
         mw.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        mw.setTitle("World: " + mw.world.getWorldDisplayName());
+        mw.setTitle("World: " + mw.getWorld().getWorldDisplayName());
 
         if (!mw.loadWorld()) {
             return;
         }
 
-        mw.addTab(new MapPanel(mw.world, mw.provider), new ImageIcon(ImageUtil.readImage("world_icon.png")));
+        mw.addTab(new MapPanel(mw.getWorld(), mw.getWorldProvider()), new ImageIcon(ImageUtil.readImage("world_icon.png")));
 
         mw.pack();
         mw.setLocationRelativeTo(null);

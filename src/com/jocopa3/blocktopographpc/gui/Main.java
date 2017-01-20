@@ -90,8 +90,8 @@ public class Main {
         //System.out.println((new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile()).getPath() + nativesFolder);
         
         if(!new File(nativesFolderPath).exists()) {
-            JOptionPane.showMessageDialog(null, "Could not find natives folder: " + nativesFolder, "No Natives Found", JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
+            //JOptionPane.showMessageDialog(null, "Could not find natives folder: " + nativesFolder, "No Natives Found", JOptionPane.ERROR_MESSAGE);
+            //System.exit(0);
         }
         
         NativeLibrary.addSearchPath("leveldb", nativesFolderPath);
@@ -100,7 +100,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println(com.protolambda.blocktopograph.SystemProfile.getAvailableRAM());
         setupNatives();
-
+        
         /* Set the Nimbus look and feel */
         try {
             //javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());

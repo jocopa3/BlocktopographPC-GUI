@@ -221,13 +221,13 @@ public class WorldListPanel extends javax.swing.JPanel implements CleanableCompo
         WorldWindow mw = new WorldWindow(mValues.get(worldList.getSelectedIndex()));
 
         mw.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        mw.setTitle("World: " + mw.world.getWorldDisplayName());
+        mw.setTitle("World: " + mw.getWorld().getWorldDisplayName());
 
         if (!mw.loadWorld()) {
             return;
         }
 
-        mw.addTab(new MapPanel(mw.world, mw.provider), new ImageIcon(ImageUtil.readImage("world_icon.png")));
+        mw.addTab(new MapPanel(mw.getWorld(), mw.getWorldProvider()), new ImageIcon(ImageUtil.readImage("world_icon.png")));
 
         mw.pack();
         mw.setLocationRelativeTo(null);

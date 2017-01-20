@@ -34,8 +34,8 @@ import javax.swing.SwingConstants;
  */
 public class WorldWindow extends JFrame implements CleanableComponent {
 
-    public final World world;
-    public final WorldProvider provider;
+    private final World world;
+    private final WorldProvider provider;
     private boolean worldLoaded = false;
 
     public final String keyName;
@@ -171,6 +171,10 @@ public class WorldWindow extends JFrame implements CleanableComponent {
 
     public World getWorld() {
         return world;
+    }
+    
+    public WorldProvider getWorldProvider() {
+        return provider;
     }
 
     @Override

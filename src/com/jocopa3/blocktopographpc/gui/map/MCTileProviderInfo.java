@@ -14,11 +14,11 @@ import org.jxmapviewer.viewer.TileFactoryInfo;
  */
 public class MCTileProviderInfo extends TileFactoryInfo {
 
-    private final static int TOP_ZOOM_LEVEL = 5;
+    private final static int TOP_ZOOM_LEVEL = 6;
 
-    private final static int MAX_ZOOM_LEVEL = 5;
+    private final static int MAX_ZOOM_LEVEL = 6;
 
-    private final static int MIN_ZOOM_LEVEL = 1;
+    private final static int MIN_ZOOM_LEVEL = 0;
 
     private final static int TILE_SIZE = 256;
     private final static int[] TILE_SIZES = new int[]{16};
