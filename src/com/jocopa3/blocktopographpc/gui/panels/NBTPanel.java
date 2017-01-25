@@ -14,7 +14,7 @@ import com.jocopa3.blocktopographpc.gui.windows.WorldWindow;
 import com.jocopa3.blocktopographpc.util.MessageImportance;
 import com.jocopa3.blocktopographpc.util.PlatformUtils;
 import com.jocopa3.blocktopographpc.util.WordUtils;
-import com.jocopa3.blocktopographpc.util.nbt.NBTSignature;
+import com.jocopa3.blocktopographpc.util.nbtparser.NBTSignature;
 import com.protolambda.blocktopograph.nbt.EditableNBT;
 import com.protolambda.blocktopograph.nbt.convert.NBTConstants;
 import com.protolambda.blocktopograph.nbt.convert.NBTConstants.NBTType;
@@ -67,7 +67,6 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
 
     private static ArrayList<NBTNode> clipboard = new ArrayList<>(); // Static to allow nodes to be copied from one window to another
 
-    //public static final
     private void iterateTags(NBTNode rootNode) {
         LinkedList<NBTNode> stack = new LinkedList<>();
         stack.add(rootNode);
@@ -498,7 +497,7 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
     }
 
     private void pasteClipboardIntoSelectedNodes() {
-        if (clipboard == null || clipboard.size() == 0) {
+        if (clipboard == null || clipboard.isEmpty()) {
             return;
         }
 
@@ -675,7 +674,7 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                     } catch (Exception e) {
                         parentWindow.footerBar.logMessage("Couldn't parse NBT value", MessageImportance.ERROR);
                         returnValue = false;
-                        e.printStackTrace();
+                        //e.printStackTrace();
                     }
                 }
                 break;
@@ -734,15 +733,16 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
 
     class NBTTreeCellRenderer extends DefaultTreeCellRenderer {
 
-        private final NBTCell cell;
+        //private final NBTCell cell;
 
         NBTTreeCellRenderer() {
             super();
-            cell = new NBTCell();
+            //cell = new NBTCell();
         }
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            NBTCell cell = new NBTCell();
             int iconHeight = cell.getFont().getSize();
 
             if (value instanceof NBTNode) {

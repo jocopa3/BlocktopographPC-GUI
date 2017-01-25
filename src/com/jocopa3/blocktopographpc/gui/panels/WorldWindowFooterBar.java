@@ -9,6 +9,8 @@ import com.jocopa3.blocktopographpc.gui.MaterialIcon;
 import com.jocopa3.blocktopographpc.util.MessageImportance;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -17,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 
 /**
  *
@@ -46,8 +49,10 @@ public class WorldWindowFooterBar extends javax.swing.JPanel {
         setBorder(BorderFactory.createEtchedBorder());
 
         footerMessage.setHorizontalAlignment(SwingConstants.RIGHT);
+        footerMessage.setText(" ");
         footerMessage.setHorizontalTextPosition(SwingConstants.RIGHT);
 
+        messageIconLabel.setText(" ");
         messageIconLabel.setIconTextGap(0);
 
         GroupLayout layout = new GroupLayout(this);
@@ -55,7 +60,7 @@ public class WorldWindowFooterBar extends javax.swing.JPanel {
         layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(footerMessage, GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
+                .addComponent(footerMessage, GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(messageIconLabel)
                 .addContainerGap())
@@ -69,6 +74,14 @@ public class WorldWindowFooterBar extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private Timer timer = new Timer(5000, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent evt) {
+            footerMessage.setText("");
+            setButtonMaterialIcon(messageIconLabel, null);
+        }
+    });
+    
     public void logMessage(String message, MessageImportance importance) {
         footerMessage.setText(message);
         
@@ -87,12 +100,21 @@ public class WorldWindowFooterBar extends javax.swing.JPanel {
                 footerMessage.setFont(footerMessage.getFont().deriveFont(footerMessage.getFont().getStyle() | Font.PLAIN));
         }
         
-        if(messageIcon != null) {
-            setButtonMaterialIcon(messageIconLabel, messageIcon);
+        setButtonMaterialIcon(messageIconLabel, messageIcon);
+        
+        if(timer.isRunning()) {
+            timer.restart();
+        } else {
+            timer.start();
         }
     }
     
     private void setButtonMaterialIcon(JLabel label, MaterialIcon icon) {
+        if(icon == null) {
+            label.setIcon(null);
+            return;
+        }
+        
         int iconWidth, iconHeight;
 
         if (label.getFont() != null && getGraphics() != null) {

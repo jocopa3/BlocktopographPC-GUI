@@ -10,6 +10,8 @@ import com.jocopa3.blocktopographpc.gui.Main;
 import com.jocopa3.blocktopographpc.util.WorldListUtil;
 import com.jocopa3.blocktopographpc.gui.windows.WorldWindow;
 import com.jocopa3.blocktopographpc.options.OptionEnum;
+import com.jocopa3.blocktopographpc.util.io.FileUtils;
+import static com.jocopa3.blocktopographpc.util.io.FileUtils.zipDirectory;
 import com.protolambda.blocktopograph.Log;
 import com.protolambda.blocktopograph.util.io.IOUtil;
 import com.protolambda.blocktopograph.util.io.ImageUtil;
@@ -20,6 +22,8 @@ import java.awt.Component;
 import java.awt.Font;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -171,11 +175,21 @@ public class WorldListPanel extends javax.swing.JPanel implements CleanableCompo
 
         worldListScrollPane = new javax.swing.JScrollPane();
         worldList = new javax.swing.JList<>();
+        worldLabel = new javax.swing.JLabel();
+        buttonGridPanel = new javax.swing.JPanel();
         worldOpenButton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        refreshListButton = new javax.swing.JButton();
+        backupWorldButton = new javax.swing.JButton();
+        deleteWorldButton = new javax.swing.JButton();
 
         worldList.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         worldListScrollPane.setViewportView(worldList);
+
+        worldLabel.setFont(worldLabel.getFont().deriveFont(worldLabel.getFont().getStyle() | java.awt.Font.BOLD, worldLabel.getFont().getSize()+2));
+        worldLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        worldLabel.setText("Worlds");
+
+        buttonGridPanel.setLayout(new java.awt.GridLayout(2, 2));
 
         worldOpenButton.setBackground(new java.awt.Color(51, 153, 255));
         worldOpenButton.setText("Open World");
@@ -185,31 +199,60 @@ public class WorldListPanel extends javax.swing.JPanel implements CleanableCompo
                 worldOpenButtonActionPerformed(evt);
             }
         });
+        buttonGridPanel.add(worldOpenButton);
 
-        jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getStyle() | java.awt.Font.BOLD, jLabel1.getFont().getSize()+2));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Worlds");
+        refreshListButton.setBackground(new java.awt.Color(255, 255, 102));
+        refreshListButton.setText("Refresh List");
+        refreshListButton.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 153), new java.awt.Color(255, 255, 102), new java.awt.Color(204, 204, 0), new java.awt.Color(255, 255, 102)));
+        refreshListButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshListButtonActionPerformed(evt);
+            }
+        });
+        buttonGridPanel.add(refreshListButton);
+
+        backupWorldButton.setBackground(new java.awt.Color(102, 255, 102));
+        backupWorldButton.setText("Backup");
+        backupWorldButton.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(153, 255, 153), new java.awt.Color(102, 255, 102), new java.awt.Color(0, 204, 0), new java.awt.Color(102, 255, 102)));
+        backupWorldButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backupWorldButtonActionPerformed(evt);
+            }
+        });
+        buttonGridPanel.add(backupWorldButton);
+
+        deleteWorldButton.setBackground(new java.awt.Color(255, 51, 51));
+        deleteWorldButton.setText("Delete");
+        deleteWorldButton.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 102, 102), new java.awt.Color(255, 51, 51), new java.awt.Color(204, 0, 0), new java.awt.Color(255, 51, 51)));
+        deleteWorldButton.setEnabled(false);
+        deleteWorldButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteWorldButtonActionPerformed(evt);
+            }
+        });
+        buttonGridPanel.add(deleteWorldButton);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(worldOpenButton, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
             .addComponent(worldListScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(worldLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE)
                 .addContainerGap())
+            .addComponent(buttonGridPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(9, 9, 9)
-                .addComponent(jLabel1)
+                .addComponent(worldLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(worldListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
+                .addComponent(worldListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(worldOpenButton, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(buttonGridPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -226,8 +269,12 @@ public class WorldListPanel extends javax.swing.JPanel implements CleanableCompo
         if (!mw.loadWorld()) {
             return;
         }
+        
+        System.out.println(mw.getWorld() +" "+mw.getWorldProvider());
 
-        mw.addTab(new MapPanel(mw.getWorld(), mw.getWorldProvider()), new ImageIcon(ImageUtil.readImage("world_icon.png")));
+        mw.addTab(
+                new MapPanel(mw.getWorld(), mw.getWorldProvider()), 
+                new ImageIcon(ImageUtil.readImage("world_icon.png")));
 
         mw.pack();
         mw.setLocationRelativeTo(null);
@@ -238,9 +285,36 @@ public class WorldListPanel extends javax.swing.JPanel implements CleanableCompo
         //WorldSelectWindow.mainWindow.setVisible(false);
     }//GEN-LAST:event_worldOpenButtonActionPerformed
 
+    private void refreshListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshListButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_refreshListButtonActionPerformed
+
+    private void backupWorldButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupWorldButtonActionPerformed
+        World world = worldList.getSelectedValue();
+        
+        try {
+            File backupFolder = new File(Main.Options.get(OptionEnum.BACKUP_FOLDER.getKeyName()));
+            if(!backupFolder.exists()) {
+                backupFolder.mkdir();
+            }
+            
+            FileUtils.zipDirectory(world.worldFolder.toString(), backupFolder.toPath().resolve(world.worldFolder.getName() + ".zip").toString());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_backupWorldButtonActionPerformed
+
+    private void deleteWorldButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteWorldButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_deleteWorldButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton backupWorldButton;
+    private javax.swing.JPanel buttonGridPanel;
+    private javax.swing.JButton deleteWorldButton;
+    private javax.swing.JButton refreshListButton;
+    private javax.swing.JLabel worldLabel;
     private javax.swing.JList<World> worldList;
     private javax.swing.JScrollPane worldListScrollPane;
     private javax.swing.JButton worldOpenButton;
@@ -301,7 +375,7 @@ public class WorldListPanel extends javax.swing.JPanel implements CleanableCompo
                 setBackground(bg == null ? new Color(244, 244, 244) : bg);
                 //setForeground(fg == null ? list.getSelectionForeground() : fg);
             } else {
-                setBackground(list.getBackground());
+                setBackground(new Color(255, 255, 255));
                 setForeground(list.getForeground());
             }
 
@@ -359,7 +433,6 @@ public class WorldListPanel extends javax.swing.JPanel implements CleanableCompo
 
             return this;
         }
-
     }
 
     @Override

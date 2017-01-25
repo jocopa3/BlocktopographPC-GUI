@@ -44,7 +44,7 @@ import javax.swing.event.HyperlinkListener;
  */
 public class AboutWindow extends javax.swing.JFrame {
 
-    private static AboutWindow SingletonInstance = new AboutWindow();
+    private static final AboutWindow SingletonInstance = new AboutWindow();
 
     /**
      * Creates new form AboutWindow

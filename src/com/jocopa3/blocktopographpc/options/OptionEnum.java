@@ -6,9 +6,6 @@
 package com.jocopa3.blocktopographpc.options;
 
 import com.jocopa3.blocktopographpc.util.WorldListUtil;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import javax.swing.filechooser.FileSystemView;
 
 /**
@@ -16,6 +13,7 @@ import javax.swing.filechooser.FileSystemView;
  * @author Matt
  */
 public enum OptionEnum {
+    BACKUP_FOLDER("backup_folder", WorldListUtil.getDefaultBackupFolder(), String.class),
     WORLD_FOLDER("world_folder", WorldListUtil.getMinecraftFolderLocation(), String.class);
     
     private final String name, defaultValue;

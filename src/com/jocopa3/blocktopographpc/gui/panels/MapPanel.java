@@ -101,7 +101,7 @@ public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
 
         }
 
-        mapViewer.setLoadingImage(ImageUtil.readImage("program_icons/icon256.png"));
+        mapViewer.setLoadingImage(ImageUtil.readImage("program_icons/icon128.png"));
         mapViewer.setRestrictOutsidePanning(false);
 
         // Add interactions
@@ -135,6 +135,7 @@ public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
                 
                 provider.changeMapType(values[combo.getSelectedIndex()]);
                 ((MCTileProvider) factory).clearCache();
+                ((MCTileProvider) factory).clearQueue();
                 ((MCTileProvider) factory).stopAllThreads();
 
                 // Dimension is being changed; clear chunk cache from previous dimension
@@ -183,9 +184,9 @@ public class MapPanel extends javax.swing.JPanel implements CleanableComponent {
                 //GeoPosition g = mapViewer.getTileFactory().pixelToGeo(pixelCoordinates, mapViewer.getZoom());
                 //GeoPosition gg = new GeoPosition(g.getLatitude() + mapViewer.getCenterPosition().getLatitude(), g.getLongitude() + mapViewer.getCenterPosition().getLongitude());
                 //Point2D xy = mapViewer.getTileFactory().geoToPixel(gg, mapViewer.getZoom());
-                Rectangle rect = mapViewer.getViewportBounds();
-                //xLabel.setText(""+(rect.x + pixelCoordinates.getX()));
-                //yLabel.setText(""+(rect.y + pixelCoordinates.getY()));
+                Point2D xy = mapViewer.getTileFactory().relativeToGlobal(new Point2D.Double(pixelCoordinates.getX(), pixelCoordinates.getY()), mapViewer.getZoom());
+                xLabel.setText(""+(xy.getX()));
+                yLabel.setText(""+(xy.getY()));
             }
         });
 

@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.filechooser.FileSystemView;
 
 /**
  *
@@ -146,7 +145,10 @@ public class Options {
     }
 
     public void loadDefaultOptions() {
-        set(OptionEnum.WORLD_FOLDER);
+        for(OptionEnum defaultValue : OptionEnum.values()) {
+            set(defaultValue);
+        }
+        
         //set("cache_policy", Integer.toString(com.protolambda.blocktopograph.UsageLevel.STRICT.id));
         //set("cpu_use_policy", Integer.toString(com.protolambda.blocktopograph.UsageLevel.STRICT.id));
     }

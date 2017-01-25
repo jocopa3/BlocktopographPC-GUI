@@ -52,14 +52,8 @@ public class MCTileProvider extends TileFactory {
     public MCTileProvider(MCTileProviderInfo info) {
         super(info);
         this.info = info;
-        
-        // MAGIC!
-        long cacheSize = SystemProfile.calculateMaxObjects(262144, 0.3);
-        System.out.println("Tile Cache Size: " + cacheSize);
-        
-        tileMap = new ConcurrentLinkedHashMap.Builder<String, MCTile>()
-                .maximumWeightedCapacity(cacheSize)
-                .build();
+
+        createTileCache();
     }
 
     @Override
@@ -113,7 +107,7 @@ public class MCTileProvider extends TileFactory {
 
         MCTile tile;
         // System.out.println("testing for validity: " + tilePoint + " zoom = " + zoom);
-        if (!tileMap.containsKey(key)) {
+        if (!tileMap.containsKey(key) && !tileQueueMap.containsKey(key)) {
             MapType map = this.info.worldProvider.getMapType();
 
             tile = new MCTile(tileX, tileY, zoom, this.info.worldProvider.getChunkManager(map.dimension), map);
@@ -123,11 +117,11 @@ public class MCTileProvider extends TileFactory {
             tile = tileMap.get(key);
             // if its in the map but is low and isn't loaded yet
             // but we are in high mode
-            if (tile.getPriority() == Tile.Priority.Low && eagerLoad && !tile.isLoaded()) {
+            //if (tile.getPriority() == Tile.Priority.Low && eagerLoad && !tile.isLoaded()) {
                 // System.out.println("in high mode and want a low");
                 // tile.promote();
-                promote((MCTile) tile);
-            }
+            //   promote((MCTile) tile);
+            //}
         }
 
         return tile;
@@ -139,196 +133,23 @@ public class MCTileProvider extends TileFactory {
             service.shutdown();
             service = null;
         }
+        if(tileMap != null) {
+            tileMap.clear();
+            tileMap = null;
+        }
+        
+        if(tileQueue != null) {
+            tileQueue.clear();
+            tileQueue = null;
+        }
     }
 
-    public static final int TILESIZE = 256, HALF_WORLDSIZE = 1 << 20;
+    public static final int TILESIZE = 128, HALF_WORLDSIZE = 1 << 20;
 
     public static int worldSizeInBlocks = 2 * HALF_WORLDSIZE,
             viewSizeW = worldSizeInBlocks * TILESIZE / Dimension.OVERWORLD.chunkW,
             viewSizeL = worldSizeInBlocks * TILESIZE / Dimension.OVERWORLD.chunkL;
 
-    /*
-    @Override
-    protected void startLoading(Tile tile) {
-        System.out.println("startLoading");
-        if (tile.getImage() != null) {
-            return;
-        }
-        System.out.println("null1");
-        BufferedImage img = null;
-
-        try {
-            img = tileCache.get(tile.toString());
-        } catch (IOException ex) {
-            Logger.getLogger(MCTileProvider.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (img == null) {
-            System.out.println("null2");
-            img = new BufferedImage(TILESIZE, TILESIZE, BufferedImage.TYPE_USHORT_565_RGB);
-            MapRenderer renderer = info.worldProvider.getMapType().renderer;
-            Dimension dimension = info.worldProvider.getMapType().dimension;
-            ChunkManager cm = info.worldProvider.getChunkManager(dimension);
-            // 1 chunk per tile on scale 1.0
-            int pixelsPerBlockW_unscaled = TILESIZE / dimension.chunkW;
-            int pixelsPerBlockL_unscaled = TILESIZE / dimension.chunkL;
-            int scale = tile.getZoom();
-            // this will be the amount of chunks in the width of one tile
-            int invScale = Math.round(1 / scale);
-
-            //scale the amount of pixels, less pixels per block if zoomed out
-            int pixelsPerBlockW = Math.round(pixelsPerBlockW_unscaled / scale);
-            int pixelsPerBlockL = Math.round(pixelsPerBlockL_unscaled / scale);
-
-            int minChunkX = (tile.getX()) * scale;
-            int minChunkZ = (tile.getY()) * scale;
-            int maxChunkX = minChunkX + scale;
-            int maxChunkZ = minChunkZ + scale;
-
-            int pixelsPerChunkW = pixelsPerBlockW * dimension.chunkW;
-            int pixelsPerChunkL = pixelsPerBlockL * dimension.chunkL;
-
-            int x, z, pX, pY;
-            String tileTxt;
-            tileTxt = "(" + (minChunkX * dimension.chunkW) + "; " + (minChunkZ * dimension.chunkL) + ")";
-
-            for (z = minChunkZ, pY = 0; z < maxChunkZ; z++, pY += pixelsPerChunkL) {
-                for (x = minChunkX, pX = 0; x < maxChunkX; x++, pX += pixelsPerChunkW) {
-                    try {
-                        renderer.renderToBitmap(cm, img, dimension,
-                                x, z,
-                                0, 0,
-                                dimension.chunkW, dimension.chunkL,
-                                pX, pY,
-                                pixelsPerBlockW, pixelsPerBlockL);
-                    } catch (Exception e) {
-
-                        e.printStackTrace();
-                    }
-                }
-            }
-     */
- /*
-            // for translating to origin
-            // HALF_WORLDSIZE and TILESIZE must be a power of two
-            int tilesInHalfWorldW = (HALF_WORLDSIZE * pixelsPerBlockW) / TILESIZE;
-            int tilesInHalfWorldL = (HALF_WORLDSIZE * pixelsPerBlockL) / TILESIZE;
-            
-            // translate tile coord to origin, multiply origin-relative-tile-coordinate with the chunks per tile
-            //int minChunkX = (tile.getX() - tilesInHalfWorldW) * invScale;
-            //int minChunkZ = (tile.getY() - tilesInHalfWorldL) * invScale;
-            int minChunkX = (tile.getX()) * invScale;
-            int minChunkZ = (tile.getY()) * invScale;
-            int maxChunkX = minChunkX + invScale;
-            int maxChunkZ = minChunkZ + invScale;
-            
-            //scale pixels to dimension scale (Nether 1 : 8 Overworld)
-            pixelsPerBlockW *= dimension.dimensionScale;
-            pixelsPerBlockL *= dimension.dimensionScale;
-            
-            int x, z, pX, pY;
-            String tileTxt;
-            
-            //check if the tile is not aligned with its inner chunks
-            //hacky: it must be a single chunk that is to big for the tile, render just the visible part, easy.
-            int alignment = invScale % dimension.dimensionScale;
-            if (alignment > 0) {
-            
-            int chunkX = minChunkX / dimension.dimensionScale;
-            if (minChunkX % dimension.dimensionScale < 0) {
-            chunkX -= 1;
-            }
-            int chunkZ = minChunkZ / dimension.dimensionScale;
-            if (minChunkZ % dimension.dimensionScale < 0) {
-            chunkZ -= 1;
-            }
-            
-            int stepX = dimension.chunkW / dimension.dimensionScale;
-            int stepZ = dimension.chunkL / dimension.dimensionScale;
-            int minX = (minChunkX % dimension.dimensionScale) * stepX;
-            if (minX < 0) {
-            minX += dimension.chunkW;
-            }
-            int minZ = (minChunkZ % dimension.dimensionScale) * stepZ;
-            if (minZ < 0) {
-            minZ += dimension.chunkL;
-            }
-            int maxX = (maxChunkX % dimension.dimensionScale) * stepX;
-            if (maxX <= 0) {
-            maxX += dimension.chunkW;
-            }
-            int maxZ = (maxChunkZ % dimension.dimensionScale) * stepZ;
-            if (maxZ <= 0) {
-            maxZ += dimension.chunkL;
-            }
-            
-            tileTxt = chunkX + ";" + chunkZ + " (" + ((chunkX * dimension.chunkW) + minX) + "; " + ((chunkZ * dimension.chunkL) + minZ) + ")";
-            
-            renderer.renderToBitmap(cm, img, dimension,
-            chunkX, chunkZ,
-            minX, minZ,
-            maxX, maxZ,
-            0, 0,
-            pixelsPerBlockW, pixelsPerBlockL);
-            
-            } else {
-            
-            minChunkX /= dimension.dimensionScale;
-            minChunkZ /= dimension.dimensionScale;
-            maxChunkX /= dimension.dimensionScale;
-            maxChunkZ /= dimension.dimensionScale;
-            
-            tileTxt = "(" + (minChunkX * dimension.chunkW) + "; " + (minChunkZ * dimension.chunkL) + ")";
-            
-            int pixelsPerChunkW = pixelsPerBlockW * dimension.chunkW;
-            int pixelsPerChunkL = pixelsPerBlockL * dimension.chunkL;
-            
-            System.out.println(pixelsPerBlockW+", "+pixelsPerBlockL);
-            
-            for (z = minChunkZ, pY = 0; z < maxChunkZ; z++, pY += pixelsPerChunkL) {
-            
-            for (x = minChunkX, pX = 0; x < maxChunkX; x++, pX += pixelsPerChunkW) {
-            
-            try {
-            renderer.renderToBitmap(cm, img, dimension,
-            x, z,
-            0, 0,
-            dimension.chunkW, dimension.chunkL,
-            pX, pY,
-            pixelsPerBlockW, pixelsPerBlockL);
-            } catch (Exception e) {
-            
-            e.printStackTrace();
-            }
-            
-            }
-            }
-            }
-     */
- /*
-            drawText(tileTxt, img, Color.WHITE.getRGB(), 0);
-            //draw tile-edges white
-            for (int i = 0; i < TILESIZE; i++) {
-
-                //horizontal edges
-                img.setRGB(i, 0, Color.WHITE.getRGB());
-                img.setRGB(i, TILESIZE - 1, Color.WHITE.getRGB());
-
-                //vertical edges
-                img.setRGB(0, i, Color.WHITE.getRGB());
-                img.setRGB(TILESIZE - 1, i, Color.WHITE.getRGB());
-            }
-        }
-
-        tile.image = new SoftReference<>(img);
-
-        byte[] bimg = ImageUtil.asBytes(img);
-        tileCache.put(tile.toString(), bimg, img);
-        tile.setLoaded(true);
-
-        fireTileLoadedEvent(tile);
-    }
-     */
     @Override
     protected synchronized void startLoading(Tile tile) {
         if (tile.isLoading()) {
@@ -338,6 +159,7 @@ public class MCTileProvider extends TileFactory {
         tile.setLoading(true);
         try {
             tileQueue.put((MCTile) tile);
+            tileQueueMap.put(tile.toString(), null);
             getService().submit(createTileRunner((MCTile) tile));
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -405,12 +227,34 @@ public class MCTileProvider extends TileFactory {
         return b;
     }
 
+    private void createTileCache() {
+        long cacheSize = SystemProfile.calculateMaxObjects(128*128*2, 0.3);
+        System.out.println("Tile Cache Size: " + cacheSize);
+
+        tileMap = new ConcurrentLinkedHashMap.Builder<String, MCTile>()
+                .maximumWeightedCapacity(cacheSize)
+                .build();
+    }
+
+    private int cacheClears = 0;
+
     public void clearCache() {
-        tileMap.clear();
+        cacheClears++;
+
+        // Resize the cache after 3 clears
+        if (cacheClears >= 3) {
+            createTileCache();
+            cacheClears = 0;
+        } else {
+            tileMap.clear();
+        }
+        
+        System.gc();
     }
 
     public void clearQueue() {
         tileQueue.clear();
+        tileQueueMap.clear();
     }
 
     public void stopAllThreads() {
@@ -438,6 +282,8 @@ public class MCTileProvider extends TileFactory {
 
         }
     });
+    
+    private HashMap<String, Object> tileQueueMap = new HashMap<>();
 
     /**
      * Subclasses may override this method to provide their own executor
@@ -497,25 +343,26 @@ public class MCTileProvider extends TileFactory {
              * failure, I can get out and let other tiles try to load.
              */
             final MCTile tile = tileQueue.remove();
+            tileQueueMap.remove(tile.toString());
 
             int trys = 3;
             while (!tile.isLoaded() && trys > 0) {
                 try {
-                    if (shouldDiscardTile(tile, true)) {
-                        return;
-                    }
-                    
+                    //if (shouldDiscardTile(tile, true)) {
+                    //    return;
+                    //}
+
                     final BufferedImage img = getRenderedImage(tile);
-                    
+
                     SwingUtilities.invokeAndWait(new Runnable() {
                         @Override
                         public void run() {
                             tile.image = new SoftReference<BufferedImage>(img);
                             tile.setLoaded(true);
-                            
-                            if (!shouldDiscardTile(tile, true)) {
-                                fireTileLoadedEvent(tile);
-                            }
+
+                            //if (!shouldDiscardTile(tile, true)) {
+                            fireTileLoadedEvent(tile);
+                            //}
                         }
                     });
                 } catch (Throwable e) {
@@ -545,11 +392,11 @@ public class MCTileProvider extends TileFactory {
             BufferedImage img;
 
             int tileScale = 1;
-            if (tile.getZoom() > 4) {
-                tileScale = 1 << (tile.getZoom() - 4);
+            if (tile.getZoom() > 3) {
+                tileScale = 1 << (tile.getZoom() - 3);
             }
 
-            img = new BufferedImage(TILESIZE * tileScale, TILESIZE * tileScale, BufferedImage.TYPE_INT_ARGB);
+            img = new BufferedImage(TILESIZE * tileScale, TILESIZE * tileScale, BufferedImage.TYPE_USHORT_565_RGB);
             MapRenderer renderer = tile.getMapType().renderer;
             Dimension dimension = tile.getMapType().dimension;
             ChunkManager cm = tile.getChunkManager();
@@ -585,7 +432,7 @@ public class MCTileProvider extends TileFactory {
                     if (Thread.interrupted()) {
                         return null;
                     }
-                    
+
                     try {
                         renderer.renderToBitmap(cm, img, dimension,
                                 Math.round(x), Math.round(z),
@@ -705,9 +552,10 @@ public class MCTileProvider extends TileFactory {
             }
              */
             img = ImageUtil.scaleImage(img, TILESIZE, TILESIZE);
-            
-            drawText(tileTxt, img, Color.WHITE.getRGB(), 0);
+
+            //drawText(tileTxt, img, Color.WHITE.getRGB(), 0);
             //draw tile-edges white
+            /*
             for (int i = 0; i < TILESIZE; i++) {
 
                 //horizontal edges
@@ -718,7 +566,7 @@ public class MCTileProvider extends TileFactory {
                 img.setRGB(0, i, Color.WHITE.getRGB());
                 img.setRGB(TILESIZE - 1, i, Color.WHITE.getRGB());
             }
-             
+            */
             return img;
         }
 

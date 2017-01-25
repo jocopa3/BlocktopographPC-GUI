@@ -20,7 +20,7 @@ public class MCTileProviderInfo extends TileFactoryInfo {
 
     private final static int MIN_ZOOM_LEVEL = 0;
 
-    private final static int TILE_SIZE = 256;
+    private final static int TILE_SIZE = 128;
     private final static int[] TILE_SIZES = new int[]{16};
 
     WorldProvider worldProvider;

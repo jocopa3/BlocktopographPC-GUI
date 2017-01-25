@@ -196,7 +196,7 @@ public class WorldWindow extends JFrame implements CleanableComponent {
             // Oh boy... this is really really bad...
             ex.printStackTrace();
         }
-
+        System.gc();
         return fullyCleaned;
     }
 

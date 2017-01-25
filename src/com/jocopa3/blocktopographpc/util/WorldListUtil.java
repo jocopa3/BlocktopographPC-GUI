@@ -1,10 +1,14 @@
 package com.jocopa3.blocktopographpc.util;
 
+import com.jocopa3.blocktopographpc.options.Options;
 import com.protolambda.blocktopograph.world.World;
 import com.sun.jna.Platform;
 import java.io.File;
+import java.net.URISyntaxException;
 
 import java.text.DateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.filechooser.FileSystemView;
 
 public class WorldListUtil {
@@ -80,13 +84,23 @@ public class WorldListUtil {
                     .append("\\Microsoft.MinecraftUWP_")
                     .append(MicrosoftPublisherID)
                     .append("\\LocalState\\games\\com.mojang\\minecraftWorlds");
-            
-            System.out.println(folder.toString());
+
+            System.out.println("Minecraft worlds folder: " + folder.toString());
+
             if (new File(folder.toString()).exists()) {
                 return folder.toString();
             }
         }
 
         return FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
+    }
+
+    public static String getDefaultBackupFolder() {
+        try {
+            File parentFolder = new File(Options.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+            return parentFolder.toPath().resolve("backups").toString();
+        } catch (URISyntaxException ex) {
+            return FileSystemView.getFileSystemView().getDefaultDirectory().toPath().resolve("backups").toString();
+        }
     }
 }

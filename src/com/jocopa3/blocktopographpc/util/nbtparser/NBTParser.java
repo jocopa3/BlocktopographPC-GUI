@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jocopa3.blocktopographpc.util.nbt;
+package com.jocopa3.blocktopographpc.util.nbtparser;
 
 import com.protolambda.blocktopograph.nbt.tags.*;
 import java.util.LinkedList;
