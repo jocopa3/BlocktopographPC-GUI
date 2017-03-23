@@ -128,6 +128,15 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
         setName(nbtData.getRootTitle());
         setTreeModel();
     }
+    
+    public NBTPanel(EditableNBT nbtData) {
+        initComponents();
+
+        this.parentWindow = null;
+        this.nbtData = nbtData;
+        setName(nbtData.getRootTitle());
+        setTreeModel();
+    }
 
     private boolean buttonsInited = false;
 
@@ -660,7 +669,8 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                         try {
                             node.getTag().setValue(NBTType.parseValue(nodeData[0], nodeType));
                         } catch (Exception e) {
-                            parentWindow.footerBar.logMessage("Couldn't parse NBT value", MessageImportance.ERROR);
+                            e.printStackTrace();
+                            //parentWindow.footerBar.logMessage("Couldn't parse NBT value", MessageImportance.ERROR);
                             returnValue = false;
                         }
                     }
@@ -672,7 +682,8 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
                     try {
                         node.getTag().setValue(NBTType.parseValue(nodeData[1], nodeType));
                     } catch (Exception e) {
-                        parentWindow.footerBar.logMessage("Couldn't parse NBT value", MessageImportance.ERROR);
+                        e.printStackTrace();
+                        //parentWindow.footerBar.logMessage("Couldn't parse NBT value", MessageImportance.ERROR);
                         returnValue = false;
                         //e.printStackTrace();
                     }
@@ -743,7 +754,7 @@ public class NBTPanel extends javax.swing.JPanel implements CleanableComponent {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             NBTCell cell = new NBTCell();
-            int iconHeight = cell.getFont().getSize();
+            int iconHeight = (int)(cell.getFont().getSize() * 1.6f);
 
             if (value instanceof NBTNode) {
                 Tag tag = ((NBTNode) value).getTag();

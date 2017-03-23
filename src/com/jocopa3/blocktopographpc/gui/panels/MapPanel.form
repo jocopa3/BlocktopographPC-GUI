@@ -12,11 +12,17 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Edit Entities"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openEntityNbtMenuItemActionPerformed"/>
+          </Events>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="openTileEntityNbtMenuItem">
           <Properties>
             <Property name="text" type="java.lang.String" value="Edit Tile Entities"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openTileEntityNbtMenuItemActionPerformed"/>
+          </Events>
         </MenuItem>
       </SubComponents>
     </Container>

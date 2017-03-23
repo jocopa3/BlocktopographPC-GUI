@@ -13,8 +13,8 @@ public class WordUtils {
 
     public static String capitalizeString(String string) {
         char[] chars = string.toLowerCase().toCharArray();
-        char underscore = "_".charAt(0);
-        char space = " ".charAt(0);
+        char underscore = '_';
+        char space = ' ';
         boolean found = false;
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == underscore) {
@@ -24,26 +24,25 @@ public class WordUtils {
             if (!found && Character.isLetter(chars[i])) {
                 chars[i] = Character.toUpperCase(chars[i]);
                 found = true;
-            } else if (Character.isWhitespace(chars[i])) { // You can add other chars here
+            } else if (Character.isWhitespace(chars[i])) {
                 found = false;
             }
         }
         return String.valueOf(chars);
     }
-    
+
     public static String whitespaceBeforeUppercase(String string) {
         char[] chars = string.toCharArray();
         StringBuilder charBuilder = new StringBuilder();
         charBuilder.append(chars[0]);
-        
+
         for (int i = 1; i < chars.length; i++) {
             if (Character.isUpperCase(chars[i])) {
-                charBuilder.append(" ").append(chars[i]);
-            } else {
-                charBuilder.append(chars[i]);
+                charBuilder.append(" ");
             }
+            charBuilder.append(chars[i]);
         }
-        
+
         return charBuilder.toString();
     }
 }

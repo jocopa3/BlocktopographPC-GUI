@@ -273,7 +273,7 @@ public class WorldListPanel extends javax.swing.JPanel implements CleanableCompo
         System.out.println(mw.getWorld() +" "+mw.getWorldProvider());
 
         mw.addTab(
-                new MapPanel(mw.getWorld(), mw.getWorldProvider()), 
+                new MapPanel(mw), 
                 new ImageIcon(ImageUtil.readImage("world_icon.png")));
 
         mw.pack();

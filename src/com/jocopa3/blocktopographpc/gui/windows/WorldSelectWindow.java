@@ -7,7 +7,9 @@ package com.jocopa3.blocktopographpc.gui.windows;
 
 import com.jocopa3.blocktopographpc.gui.Main;
 import com.jocopa3.blocktopographpc.gui.panels.MapPanel;
+import com.jocopa3.blocktopographpc.gui.panels.NBTPanel;
 import com.jocopa3.blocktopographpc.options.OptionEnum;
+import com.protolambda.blocktopograph.nbt.CompoundTagNBT;
 import com.protolambda.blocktopograph.util.io.ImageUtil;
 import com.protolambda.blocktopograph.world.World;
 import java.awt.image.BufferedImage;
@@ -59,6 +61,7 @@ public class WorldSelectWindow extends javax.swing.JFrame {
         fileMenu = new javax.swing.JMenu();
         openWorldMenuItem = new javax.swing.JMenuItem();
         selectWorldFolderMenuItem = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
 
@@ -88,6 +91,15 @@ public class WorldSelectWindow extends javax.swing.JFrame {
             }
         });
         fileMenu.add(selectWorldFolderMenuItem);
+
+        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem1.setText("Open NBT File");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        fileMenu.add(jMenuItem1);
 
         jMenuBar1.add(fileMenu);
 
@@ -123,7 +135,7 @@ public class WorldSelectWindow extends javax.swing.JFrame {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File("."));
         chooser.setDialogTitle("Select World");
-        
+
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.setFileFilter(new FileFilter() {
             @Override
@@ -131,7 +143,7 @@ public class WorldSelectWindow extends javax.swing.JFrame {
                 if (f.isDirectory()) {
                     return true;
                 }
-                
+
                 final String name = f.getName();
                 return name.toLowerCase().equals("level.dat");
             }
@@ -141,10 +153,13 @@ public class WorldSelectWindow extends javax.swing.JFrame {
                 return "level.dat";
             }
         });
-        
+
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             try {
-                openNewWorldWindow(new World(chooser.getSelectedFile().getParentFile()));
+                WorldWindow mw = openNewWorldWindow(new World(chooser.getSelectedFile().getParentFile()));
+                if (mw != null) {
+                    mw.addTab(new MapPanel(mw), new ImageIcon(ImageUtil.readImage("world_icon.png")));
+                }
             } catch (World.WorldLoadException ex) {
                 ex.printStackTrace();
             }
@@ -155,10 +170,10 @@ public class WorldSelectWindow extends javax.swing.JFrame {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Main.Options.get(OptionEnum.WORLD_FOLDER.getKeyName())));
         chooser.setDialogTitle("Select World Folder");
-        
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
+
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);
-        
+
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             Main.Options.set(OptionEnum.WORLD_FOLDER.getKeyName(), chooser.getSelectedFile().getPath());
             worldListPanel.reloadWorldList();
@@ -168,6 +183,36 @@ public class WorldSelectWindow extends javax.swing.JFrame {
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
         AboutWindow.showWindow();
     }//GEN-LAST:event_aboutMenuItemActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File("."));
+        chooser.setDialogTitle("Select World");
+
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if (f.isDirectory()) {
+                    return true;
+                }
+
+                final String name = f.getName();
+                return name.toLowerCase().endsWith("nbt");
+            }
+
+            @Override
+            public String getDescription() {
+                return "NBT File";
+            }
+        });
+
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            SinglePanelWindow window = new SinglePanelWindow(new NBTPanel(new CompoundTagNBT(chooser.getSelectedFile())));
+            window.setVisible(true);
+            Main.OpenWindows.put(window.getName(), window);
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     @Override
     public void setVisible(boolean visible) {
@@ -183,29 +228,28 @@ public class WorldSelectWindow extends javax.swing.JFrame {
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem openWorldMenuItem;
     private javax.swing.JMenuItem selectWorldFolderMenuItem;
     private com.jocopa3.blocktopographpc.gui.panels.WorldListPanel worldListPanel;
     // End of variables declaration//GEN-END:variables
 
-    public void openNewWorldWindow(World world) {
+    public WorldWindow openNewWorldWindow(World world) {
         WorldWindow mw = new WorldWindow(world);
 
         mw.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         mw.setTitle("World: " + mw.getWorld().getWorldDisplayName());
 
         if (!mw.loadWorld()) {
-            return;
+            return null;
         }
-
-        mw.addTab(new MapPanel(mw.getWorld(), mw.getWorldProvider()), new ImageIcon(ImageUtil.readImage("world_icon.png")));
-
         mw.pack();
         mw.setLocationRelativeTo(null);
 
         mw.setVisible(true);
 
         Main.OpenWindows.put(mw.keyName, mw);
+        return mw;
     }
 
 }

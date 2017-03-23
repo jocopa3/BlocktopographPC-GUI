@@ -5,12 +5,15 @@
  */
 package com.jocopa3.blocktopographpc.gui.panels;
 
+import com.jocopa3.blocktopographpc.gui.dialogs.ChunkNBTDialog;
+import com.jocopa3.blocktopographpc.gui.dialogs.CustomNBTDialog;
 import com.jocopa3.blocktopographpc.gui.nbt.NBTIcon;
 import com.jocopa3.blocktopographpc.gui.windows.WorldWindow;
 import com.protolambda.blocktopograph.nbt.EditableNBT;
 import com.protolambda.blocktopograph.util.io.ImageUtil;
 import com.protolambda.blocktopograph.world.World;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.GroupLayout;
@@ -75,11 +78,15 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
         openDimension2NBT = new JButton();
         openAutonomousEntitiesNBT = new JButton();
         openBiomeDataNBT = new JButton();
+        jButton1 = new JButton();
 
         setBackground(new Color(255, 255, 255));
 
         optionScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         optionScrollPane.setHorizontalScrollBar(null);
+        optionScrollPane.setMinimumSize(new Dimension(0, 0));
+
+        scrollPanel.setMinimumSize(new Dimension(191, 400));
 
         openPlayerNBT.setText("Singleplayer NBT");
         openPlayerNBT.addActionListener(new ActionListener() {
@@ -172,6 +179,13 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
             }
         });
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         GroupLayout scrollPanelLayout = new GroupLayout(scrollPanel);
         scrollPanel.setLayout(scrollPanelLayout);
         scrollPanelLayout.setHorizontalGroup(scrollPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -191,7 +205,8 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
                     .addComponent(openDimension1NBT, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(openDimension2NBT, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(openAutonomousEntitiesNBT, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(openBiomeDataNBT, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(openBiomeDataNBT, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         scrollPanelLayout.setVerticalGroup(scrollPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -224,7 +239,9 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
                 .addComponent(openDimension2NBT)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(openAutonomousEntitiesNBT)
-                .addContainerGap(182, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         optionScrollPane.setViewportView(scrollPanel);
@@ -232,10 +249,10 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(optionScrollPane)
+            .addComponent(optionScrollPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(optionScrollPane)
+            .addComponent(optionScrollPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -447,8 +464,14 @@ public class WorldWindowSideBar extends javax.swing.JPanel {
         parentWindow.addTab(new NBTPanel(parentWindow, nbtData), NBTIcon.COMPOUND.icon);
     }//GEN-LAST:event_openBiomeDataNBTActionPerformed
 
+    private void jButton1ActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        CustomNBTDialog dialog = new CustomNBTDialog(parentWindow, true);
+        dialog.setVisible(true); //map_-60129542139
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private JButton jButton1;
     private JSeparator jSeparator2;
     private JButton openAutonomousEntitiesNBT;
     private JButton openBiomeDataNBT;

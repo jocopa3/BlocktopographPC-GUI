@@ -7,7 +7,6 @@ package com.jocopa3.blocktopographpc.gui.map;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.protolambda.blocktopograph.SystemProfile;
-import com.protolambda.blocktopograph.chunk.Chunk;
 import com.protolambda.blocktopograph.chunk.ChunkManager;
 import com.protolambda.blocktopograph.chunk.Version;
 import com.protolambda.blocktopograph.map.Dimension;
@@ -18,12 +17,9 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.lang.ref.SoftReference;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.jxmapviewer.viewer.Tile;
-import org.jxmapviewer.viewer.TileCache;
 import org.jxmapviewer.viewer.TileFactory;
 
 /**
@@ -220,10 +215,10 @@ public class MCTileProvider extends TileFactory {
         mTextLayout.draw(c);
         c.restore();
          */
-        Graphics graphics = b.getGraphics();
-        graphics.setColor(Color.WHITE);
-        graphics.setFont(new Font("Segoe", Font.PLAIN, b.getHeight() / 16));
-        graphics.drawString(text, 2, graphics.getFont().getSize() + 2);
+        //Graphics graphics = b.getGraphics();
+        //graphics.setColor(Color.WHITE);
+        //graphics.setFont(new Font("Segoe", Font.PLAIN, b.getHeight() / 8));
+        //graphics.drawString(text, 2, graphics.getFont().getSize() + 2);
         return b;
     }
 
@@ -238,18 +233,16 @@ public class MCTileProvider extends TileFactory {
 
     private int cacheClears = 0;
 
-    public void clearCache() {
+    public void clearCache(boolean forceClear) {
         cacheClears++;
 
         // Resize the cache after 3 clears
-        if (cacheClears >= 3) {
+        if (!forceClear && cacheClears >= 3) {
             createTileCache();
             cacheClears = 0;
         } else {
             tileMap.clear();
         }
-        
-        System.gc();
     }
 
     public void clearQueue() {
@@ -406,10 +399,7 @@ public class MCTileProvider extends TileFactory {
             int pixelsPerBlockL_unscaled = (TILESIZE * tileScale) / dimension.chunkL;
 
             int scale = 1 << tile.getZoom();
-            int blockScale = 1;
 
-            // this will be the amount of chunks in the width of one tile
-            int invScale = Math.round(1 / scale);
             //scale the amount of pixels, less pixels per block if zoomed out
             int pixelsPerBlockW = Math.round(pixelsPerBlockW_unscaled / scale);
             int pixelsPerBlockL = Math.round(pixelsPerBlockL_unscaled / scale);
@@ -441,7 +431,7 @@ public class MCTileProvider extends TileFactory {
                                 Math.round(pX), Math.round(pY),
                                 Math.round(pixelsPerBlockW), Math.round(pixelsPerBlockL));
                     } catch (OutOfMemoryError e) {
-                        clearCache();
+                        clearCache(false);
                         cm.disposeAll();
                         e.printStackTrace();
                         return null;
@@ -553,7 +543,7 @@ public class MCTileProvider extends TileFactory {
              */
             img = ImageUtil.scaleImage(img, TILESIZE, TILESIZE);
 
-            //drawText(tileTxt, img, Color.WHITE.getRGB(), 0);
+            drawText(tileTxt, img, Color.WHITE.getRGB(), 0);
             //draw tile-edges white
             /*
             for (int i = 0; i < TILESIZE; i++) {
